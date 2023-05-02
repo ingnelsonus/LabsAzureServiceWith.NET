@@ -54,6 +54,36 @@ namespace BlobApp
         }
 
 
+        private void UpdateEntity(string orderId, string category, int quantity)
+        {
+            TableClient tableClient = new TableClient(connectionString, tableName);
+
+            Pageable<TableEntity> result = tableClient.Query<TableEntity>(e => e.PartitionKey == orderId);
+
+            if(result.Count()>0)
+            {
+
+                TableEntity keyValuePairs = new TableEntity(orderId, category)
+                {
+                    {"quantity",quantity }
+                };
+
+                var resultUpdate =  tableClient.UpdateEntity(keyValuePairs,ETag.All);
+                Console.WriteLine("Order Updated");
+            }
+
+
+            //// Let's first get the entity that we want to update
+            //TableClient tableClient = new TableClient(connectionString, tableName);
+            //Order order = tableClient.GetEntity<Order>(category, orderID);
+            //order.quantity = quantity;
+
+            //tableClient.UpdateEntity<Order>(order, ifMatch: ETag.All, TableUpdateMode.Replace);
+
+            //Console.WriteLine("Entity updated");
+
+        }
+
 
     }
 }
