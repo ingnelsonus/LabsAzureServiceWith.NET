@@ -46,8 +46,29 @@ string containerName = "Orders";
 /// <summary>
 /// Delete Items on to a container
 /// </summary>
-await DeleteItem();
+//await DeleteItem();
 
+
+/// <summary>
+/// Delete Items on to a container
+/// </summary>
+await AddItem2("C1","CustomerA","New York",
+              new List<Order>()
+              { 
+                  new Order
+                  {
+                      orderId = "01",
+                      category ="Laptop",
+                      quantity =100
+                  },
+                  new Order
+                  {
+                      orderId = "05",
+                      category ="Desktop",
+                      quantity =75
+                  }
+              }
+      );
 
 async Task CreateDataBase(string databaseName)
 {
@@ -180,3 +201,21 @@ async Task DeleteItem()
     Console.WriteLine("Item is deleted");
 }
 
+async Task AddItem2(string customerId,string customerName,string customerCity,List<Order> orders)
+{
+    CosmosClient cosmosClient = new CosmosClient(cosmosEndpointUri, cosmosDBKey);
+    Database database = cosmosClient.GetDatabase(databaseName);
+    Container container = database.GetContainer("Customers");
+
+    Customer customer = new Customer()
+    {
+        customerId = customerId,
+        customerName = customerName,
+        customerCity = customerCity,
+        orders = orders
+    };
+
+    await container.CreateItemAsync<Customer>(customer,new PartitionKey(customerCity));
+    Console.WriteLine($"Add Customer with id {customerId}");
+
+}
